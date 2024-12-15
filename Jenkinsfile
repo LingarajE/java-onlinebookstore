@@ -1,30 +1,21 @@
 pipeline {
-    agent any
+    agent {label "dev"}
+
     stages {
-        stage ('checkout') {
+        stage('Git checkout') {
             steps {
-                echo "This is checkout stage"
+                git branch: 'main', url: 'https://github.com/LingarajE/java-onlinebookstore.git'
             }
         }
-        stage ('build') {
+        stage('Build the project') {
             steps {
-                echo "This is build stage "
+                sh 'mvn clean package'
             }
         }
-        stage ('sonarscan') {
+        stage('Tomcat deployment') {
             steps {
-                echo "This is sonarscan stage "
+                deploy adapters: [tomcat9(credentialsId: 'TomcatadminID', path: '', url: 'http://18.213.245.60:8080/')], contextPath: null, war: '**/*.war'
             }
-        }               
-        stage ('push') {
-            steps {
-                echo "This is push stage"
-            }
-        }
-        stage ('deploy') {
-            steps {
-                echo "This is deploy stage "
-            }
-        }                    
+        }        
     }
 }
