@@ -1,0 +1,30 @@
+pipeline {
+    agent {label "dev"}
+
+    stages {
+        stage('Git checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/LingarajE/java-onlinebookstore.git'
+            }
+        }
+        stage('Build the project') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('Deploy') {
+		     parallel {
+                    stage('Deploy to tomcat9') {              
+                       steps {
+                deploy adapters: [tomcat9(credentialsId: 'TomcatadminID', path: '', url: 'http://18.213.245.60:8080/')], contextPath: null, war: '**/*.war'
+            }
+		}
+                    stage('Deploy to tomcat10') {              
+                       steps {
+					   deploy adapters: [tomcat9(credentialsId: 'TomcatadminID22', path: '', url: 'http://3.87.94.26:8080/')], contextPath: null, war: '**/*.war'
+            }
+        }
+    }
+}
+}
+}
